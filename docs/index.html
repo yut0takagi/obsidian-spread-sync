@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spread Sync — Google Sheets ↔ Obsidian</title>
+  <meta name="description" content="Embed Google Sheets cells and ranges directly into Obsidian notes. Edit them inline. Push back. PKCE OAuth, conflict-aware, batched.">
+  <meta property="og:title" content="Spread Sync — Google Sheets ↔ Obsidian">
+  <meta property="og:description" content="Embed Sheets cells/ranges in Obsidian. Edit inline. Push back. PKCE OAuth.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <div class="brand">spread<span class="dot">·</span>sync</div>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#usage">Usage</a></li>
+      <li><a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">GitHub →</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <h1>Your Sheet,<br>inside your Note.</h1>
+    <p class="tag">Embed Google Sheets cells and ranges directly into Obsidian Markdown. Edit them in place. Push back. Conflict-aware writes via Drive modifiedTime. PKCE OAuth.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#install">Get started</a>
+      <a class="btn btn-ghost" href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">View on GitHub</a>
+    </div>
+    <div class="hero-pills">
+      <span class="pill">Obsidian 1.4+</span>
+      <span class="pill">Desktop only</span>
+      <span class="pill">PKCE OAuth</span>
+      <span class="pill">MIT License</span>
+      <span class="pill">59 tests</span>
+    </div>
+  </div>
+</header>
+
+<!-- ──────────────────────────────── Features ──────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <h2>What it does</h2>
+    <p class="lede">Read, render, edit, and push back. All inside your vault. The sheet is the source of truth — your note is the lens.</p>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="ico">🔢</div>
+        <h3>Inline cell read</h3>
+        <p><code>`spread_sync("id", "Sheet1", "B3")`</code> renders as the live cell value. Dataview-style hybrid.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">📋</div>
+        <h3>Range as table</h3>
+        <p>Fenced <code>```spread-sync```</code> block renders a range as a Markdown table — headers, transpose, named ranges supported.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">✏️</div>
+        <h3>Edit in place</h3>
+        <p>Add <code>editable: true</code> — cells become editable. Dirty cells highlight. One click pushes them all back via <code>values:batchUpdate</code>.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">🛡️</div>
+        <h3>Conflict-aware</h3>
+        <p>Drive <code>modifiedTime</code> check before every push. If the sheet changed externally, you get an Overwrite / Cancel prompt.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">🔐</div>
+        <h3>PKCE OAuth</h3>
+        <p>Your own Google Cloud OAuth client. Refresh token encrypted via Electron <code>safeStorage</code>. Production-published consent screen avoids 7-day expiry.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">⚡</div>
+        <h3>Smart caching</h3>
+        <p>LRU + debounced persist. Stale-while-revalidate on file open. Manual refresh commands. Auto-disabled when editing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Install ──────────────────────────────── -->
+<section id="install">
+  <div class="container">
+    <h2>Install</h2>
+    <p class="lede">Manual install for now — Community Plugins listing is in progress.</p>
+
+    <pre><code><span class="c-cmt"># clone into your vault's plugins directory</span>
+cd /path/to/your/vault/.obsidian/plugins
+git clone https://github.com/yut0takagi/obsidian-spread-sync.git spread-sync
+cd spread-sync
+npm install
+npm run build</code></pre>
+
+    <p style="margin-top: 20px;">Then in Obsidian: <strong>Settings → Community plugins → enable Spread Sync</strong>.</p>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Setup ──────────────────────────────── -->
+<section id="setup">
+  <div class="container">
+    <h2>5-minute setup</h2>
+    <p class="lede">Spread Sync uses <strong>your own</strong> Google Cloud OAuth credentials. You stay in control of scopes and quota.</p>
+
+    <ol class="steps">
+      <li>
+        <h3>Create a Google Cloud project</h3>
+        <p>Open <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>. Pick a project or create one.</p>
+      </li>
+      <li>
+        <h3>Enable the APIs</h3>
+        <p>APIs &amp; Services → Library → enable <strong>Google Sheets API</strong> and <strong>Google Drive API</strong>.</p>
+      </li>
+      <li>
+        <h3>Configure OAuth consent screen</h3>
+        <p>User type: <strong>External</strong>. Add scopes <code>.../auth/spreadsheets</code> and <code>.../auth/drive.metadata.readonly</code>. Publishing status: <strong>In production</strong> (avoids the 7-day refresh-token expiry).</p>
+      </li>
+      <li>
+        <h3>Create OAuth client</h3>
+        <p>Credentials → Create credentials → OAuth client ID → Application type: <strong>Desktop app</strong>. Copy both the Client ID and Client secret.</p>
+      </li>
+      <li>
+        <h3>Enter in Obsidian</h3>
+        <p>Settings → Spread Sync → <strong>OAuth credentials</strong> section → paste both values. Click <strong>Sign in with Google</strong>. Done.</p>
+      </li>
+    </ol>
+
+    <p style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; color: var(--text-dim); font-size: 14px; margin-top: 32px;">
+      💡 <strong>About the &ldquo;client secret&rdquo;:</strong> Google's docs explicitly say Desktop OAuth client secrets are <em>not actually confidential</em> — they ship in the binary of every desktop app. Storing it in your local Obsidian settings is consistent with how the official Google libraries handle it.
+    </p>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Usage ──────────────────────────────── -->
+<section id="usage">
+  <div class="container">
+    <h2>Usage</h2>
+    <p class="lede">Inline for single values, fenced blocks for ranges. Both work in Reading view. Editing requires the <code>editable: true</code> opt-in.</p>
+
+    <div class="usage-card">
+      <h3>Inline cell</h3>
+      <p class="desc">Single value, dropped mid-sentence.</p>
+      <pre><code>The current store count is <span class="c-fn">`spread_sync</span>(<span class="c-str">"&lt;spreadsheet-id&gt;"</span>, <span class="c-str">"Sheet1"</span>, <span class="c-str">"B3"</span>)`.</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>Range as a table</h3>
+      <p class="desc">Renders as a Markdown table.</p>
+      <pre><code>```spread-sync
+<span class="c-key">id</span>: &lt;spreadsheet-id&gt;
+<span class="c-key">sheet</span>: Sheet1
+<span class="c-key">range</span>: A1:D10
+<span class="c-key">header</span>: true        <span class="c-cmt"># optional, default true</span>
+<span class="c-key">transpose</span>: false    <span class="c-cmt"># optional, default false</span>
+```</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>✨ Editable table</h3>
+      <p class="desc">Add <code>editable: true</code>. Click cells to edit. Push button below the table batches all dirty cells.</p>
+      <pre><code>```spread-sync
+<span class="c-key">id</span>: &lt;spreadsheet-id&gt;
+<span class="c-key">sheet</span>: Sheet1
+<span class="c-key">range</span>: A1:D10
+<span class="c-key">editable</span>: true
+```</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>Whole sheet</h3>
+      <p class="desc">Omit <code>range</code> and <code>named</code>.</p>
+      <pre><code>```spread-sync
+<span class="c-key">id</span>: &lt;spreadsheet-id&gt;
+<span class="c-key">sheet</span>: Sheet1
+```</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>Named range</h3>
+      <pre><code>```spread-sync
+<span class="c-key">id</span>: &lt;spreadsheet-id&gt;
+<span class="c-key">sheet</span>: Sheet1
+<span class="c-key">named</span>: MonthlyKPI
+```</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>Alias</h3>
+      <p class="desc">Define <code>kpi → &lt;long-spreadsheet-id&gt;</code> in settings.</p>
+      <pre><code>```spread-sync
+<span class="c-key">id</span>: <span class="c-str">"@kpi"</span>
+<span class="c-key">sheet</span>: Sheet1
+<span class="c-key">range</span>: A1:C5
+```</code></pre>
+    </div>
+
+    <div class="usage-card">
+      <h3>Explicit write block</h3>
+      <p class="desc">One-shot push. Place cursor inside the block → Command Palette → <strong>Spread Sync: Push this block</strong>.</p>
+      <pre><code>```spread-write
+<span class="c-key">id</span>: &lt;spreadsheet-id&gt;
+<span class="c-key">sheet</span>: Sheet1
+<span class="c-key">target</span>: B3
+<span class="c-key">value</span>: 42
+<span class="c-key">mode</span>: replace      <span class="c-cmt"># or "append"</span>
+```</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Commands ──────────────────────────────── -->
+<section id="commands">
+  <div class="container">
+    <h2>Commands</h2>
+    <p class="lede">All available from the command palette (Cmd/Ctrl + P).</p>
+    <table>
+      <thead>
+        <tr><th>Command</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Refresh current file</code></td><td>Invalidate cache for the active file, force re-fetch</td></tr>
+        <tr><td><code>Refresh all open files</code></td><td>Same, for every open markdown leaf</td></tr>
+        <tr><td><code>Refresh by spreadsheet</code></td><td>Prompt for id/URL/@alias, invalidate all its cache entries</td></tr>
+        <tr><td><code>Push this block</code></td><td>Send the current <code>spread-write</code> block to Sheets</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Badges ──────────────────────────────── -->
+<section id="badges">
+  <div class="container">
+    <h2>Error badges</h2>
+    <p class="lede">When something goes wrong, you see a badge with a tooltip that explains exactly what.</p>
+    <table>
+      <thead>
+        <tr><th>Badge</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="demo-badge demo-badge--auth">⚠ re-auth</span></td><td>Token expired / not signed in — click to re-sign-in</td></tr>
+        <tr><td><span class="demo-badge demo-badge--access">⚠ no access</span></td><td>403 / 404 — check sharing or API enablement</td></tr>
+        <tr><td><span class="demo-badge demo-badge--access">⚠ Excel format</span></td><td>Sheet is <code>.xlsx</code>; convert to native Google Sheets first</td></tr>
+        <tr><td><span class="demo-badge demo-badge--stale">⚠ stale 12m</span></td><td>Last fetch failed; showing cached value</td></tr>
+        <tr><td><span class="demo-badge demo-badge--offline">⚠ offline</span></td><td>Network is down</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ──────────────────────────────── Architecture ──────────────────────────────── -->
+<section id="arch">
+  <div class="container">
+    <h2>Architecture</h2>
+    <p class="lede">Four isolated layers. Each one is small, testable, and replaceable.</p>
+    <pre><code>┌──────────────────────────────────────────────┐
+│  <span class="c-fn">Renderer</span>   inline / block postprocessors    │
+│              editable table widget           │
+├──────────────────────────────────────────────┤
+│  <span class="c-fn">Auth</span>       OAuth (PKCE) · safeStorage       │
+│              localhost loopback callback     │
+├──────────────────────────────────────────────┤
+│  <span class="c-fn">Sheets+Drive</span>   pure HTTP (https.request)    │
+│                 read · batchRead · write     │
+│                 batchWrite · modifiedTime    │
+│                 429 backoff                  │
+├──────────────────────────────────────────────┤
+│  <span class="c-fn">Storage</span>    LRU cache · debounced persist    │
+└──────────────────────────────────────────────┘</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>MIT &middot; <a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">GitHub</a> &middot; <a href="https://github.com/yut0takagi/obsidian-spread-sync/issues" target="_blank">Issues</a> &middot; built by <a href="https://github.com/yut0takagi" target="_blank">@yut0takagi</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

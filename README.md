@@ -1,64 +1,89 @@
-# Spread Sync
+<div align="center">
 
-Embed Google Sheets cells and ranges directly into your Obsidian notes, edit them inline, and push changes back to Sheets — all with on-open auto-fetch, conflict-aware writes, and OAuth (PKCE) sign-in.
+# 📊  Spread Sync
 
-## Features
+### Your Google Sheet, inside your Obsidian note.
 
-- **Inline cell read**: `` `spread_sync("<id>", "<sheet>", "B3")` `` → rendered as the cell value in Reading View.
-- **Range / sheet read**: ` ```spread-sync ``` ` code block → rendered as a Markdown table.
-- **In-place editing**: add `editable: true` to a `spread-sync` block → cells become editable, dirty cells highlighted, a "Push changes (N)" button writes everything back via Sheets `values:batchUpdate`.
-- **Explicit write block**: ` ```spread-write ``` ` block + `Spread Sync: Push this block` command for one-shot writes.
-- **Conflict detection** via Drive `modifiedTime` — overwrite/cancel dialog when the sheet was changed externally.
-- **PKCE OAuth** + `safeStorage`-encrypted refresh token (Desktop only).
-- **LRU cache** with stale-while-revalidate and manual refresh commands.
-- **Aliases** for spreadsheet IDs so you can move sheets without grep-replacing notes.
-- **429 retry** with exponential backoff.
+Embed sheet cells inline. Render ranges as tables. Edit them in place. Push back. All with conflict-aware writes and PKCE OAuth.
 
-## Install
+[![License: MIT](https://img.shields.io/badge/License-MIT-7c3aed.svg)](LICENSE)
+[![Obsidian](https://img.shields.io/badge/Obsidian-1.4+-7c3aed)](https://obsidian.md)
+[![Desktop only](https://img.shields.io/badge/Desktop-only-94a3b8)](#requirements)
+[![Tests](https://img.shields.io/badge/tests-59%20passing-34d399)](#development)
+[![Docs](https://img.shields.io/badge/docs-github.io-7c3aed)](https://yut0takagi.github.io/obsidian-spread-sync/)
 
-This plugin is not (yet) in the Community Plugins directory. Install manually:
+[**📖 Docs**](https://yut0takagi.github.io/obsidian-spread-sync/) · [**🚀 Install**](#install) · [**⚙️ Setup**](#setup-5-min) · [**💡 Usage**](#usage)
+
+</div>
+
+---
+
+## ✨ What it does
+
+| | |
+|---|---|
+| 🔢 **Inline cell** | `` `spread_sync("id", "Sheet1", "B3")` `` → renders as the live value |
+| 📋 **Range table** | ` ```spread-sync ``` ` block → Markdown table, headers/transpose/named ranges supported |
+| ✏️ **Edit in place** | Add `editable: true` → cells become editable, one button batchUpdates all changes |
+| ✍️ **Explicit write** | ` ```spread-write ``` ` block + `Push this block` command |
+| 🛡️ **Conflict-aware** | Drive `modifiedTime` check before every push, Overwrite/Cancel prompt on mismatch |
+| 🔐 **PKCE OAuth** | Bring your own Google Cloud Desktop client. Refresh token encrypted via `safeStorage` |
+| ⚡ **Smart caching** | LRU + debounced persist, stale-while-revalidate, manual refresh commands |
+| 🌐 **Resilient** | 429 backoff, offline-aware, dedicated error badges (`no access`, `Excel format`, etc.) |
+
+## 🚀 Install
 
 ```bash
 cd /path/to/your/vault/.obsidian/plugins
 git clone https://github.com/yut0takagi/obsidian-spread-sync.git spread-sync
-cd spread-sync
-npm install
-npm run build
+cd spread-sync && npm install && npm run build
 ```
 
 Then in Obsidian: **Settings → Community plugins → enable Spread Sync**.
 
-## Setup (5 min)
+## ⚙️ Setup (5 min)
 
-Spread Sync uses **your own Google Cloud OAuth credentials** so you control the token scopes and quota.
+Spread Sync uses **your own** Google Cloud OAuth credentials. You stay in control of scopes and quota.
 
-### 1. Create a Google Cloud project + OAuth client
+<details>
+<summary><b>Step 1 — Create a Google Cloud project</b></summary>
 
-1. Open [Google Cloud Console](https://console.cloud.google.com/) → create or select a project.
-2. **APIs & Services → Library**: enable
-   - Google Sheets API
-   - Google Drive API
-3. **APIs & Services → OAuth consent screen**:
-   - User type: **External**
-   - Add scopes: `.../auth/spreadsheets` and `.../auth/drive.metadata.readonly`
-   - Publishing status: **In production** (avoids the 7-day refresh token expiry of "Testing" mode)
-4. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
-   - Application type: **Desktop app**
-   - Copy both the **Client ID** and **Client secret**
+Open [Google Cloud Console](https://console.cloud.google.com/) → create or select a project.
+</details>
 
-> Note: Google's docs explicitly say Desktop OAuth client secrets are not actually confidential ([source](https://developers.google.com/identity/protocols/oauth2/native-app)). The plugin stores them in your local Obsidian settings.
+<details>
+<summary><b>Step 2 — Enable APIs</b></summary>
 
-### 2. Enter the credentials in Obsidian
+APIs &amp; Services → Library → enable:
+- Google Sheets API
+- Google Drive API
+</details>
 
-Settings → Spread Sync → **OAuth credentials**: paste Client ID + Client secret.
+<details>
+<summary><b>Step 3 — Configure OAuth consent screen</b></summary>
 
-### 3. Sign in
+- User type: **External**
+- Add scopes: `.../auth/spreadsheets` + `.../auth/drive.metadata.readonly`
+- Publishing status: **In production** (avoids the 7-day refresh-token expiry of "Testing" mode)
+</details>
 
-Same tab → **Sign in with Google** → browser opens → grant consent → "Signed in" appears.
+<details>
+<summary><b>Step 4 — Create OAuth client</b></summary>
 
-## Usage
+Credentials → Create credentials → OAuth client ID → Application type: **Desktop app**. Copy both **Client ID** and **Client secret**.
 
-### Inline cell (single value)
+> Note: Google's docs explicitly say Desktop OAuth client secrets are not actually confidential ([source](https://developers.google.com/identity/protocols/oauth2/native-app)). Storing it in your local Obsidian settings is consistent with how the official Google libraries handle it.
+</details>
+
+<details>
+<summary><b>Step 5 — Paste into Obsidian</b></summary>
+
+Settings → Spread Sync → **OAuth credentials** section. Paste both values. Click **Sign in with Google**. Done.
+</details>
+
+## 💡 Usage
+
+### Inline cell
 
 ```markdown
 The current store count is `spread_sync("<spreadsheet-id>", "Sheet1", "B3")`.
@@ -76,7 +101,7 @@ transpose: false    # optional, default false
 ```
 ````
 
-### Editable table
+### Editable table ✨
 
 ````markdown
 ```spread-sync
@@ -87,7 +112,13 @@ editable: true
 ```
 ````
 
-Click any cell to edit. Dirty cells highlight in yellow. "Push changes (N)" button at the bottom batchUpdates them all to Sheets in one request. Conflict detection prompts you if the sheet was modified externally since the last fetch.
+<table>
+<tr>
+<td><b>Click any cell</b> to edit.</td>
+<td>Dirty cells <b>highlight yellow</b>.</td>
+<td><b>Push button</b> at the bottom batches all dirty cells into one <code>values:batchUpdate</code>.</td>
+</tr>
+</table>
 
 ### Whole sheet
 
@@ -110,7 +141,7 @@ named: MonthlyKPI
 
 ### Aliases
 
-Set `kpi → <long-spreadsheet-id>` in settings, then:
+Set `kpi → <long-spreadsheet-id>` in settings, then reference as `"@kpi"`:
 
 ````markdown
 ```spread-sync
@@ -143,54 +174,71 @@ value:
   - [3, 4]
 ```
 
-## Commands
+## 🎛️ Commands
 
 | Command | Description |
 |---|---|
-| Spread Sync: Refresh current file | Invalidate cache for the active file, force re-fetch |
-| Spread Sync: Refresh all open files | Same, for every open markdown leaf |
-| Spread Sync: Refresh by spreadsheet | Prompt for an id / URL / @alias and invalidate all its cache entries |
-| Spread Sync: Push this block | Send the current `spread-write` block to Sheets |
+| `Spread Sync: Refresh current file` | Invalidate cache for the active file, force re-fetch |
+| `Spread Sync: Refresh all open files` | Same, for every open markdown leaf |
+| `Spread Sync: Refresh by spreadsheet` | Prompt for an id / URL / @alias and invalidate all its cache |
+| `Spread Sync: Push this block` | Send the current `spread-write` block to Sheets |
 
-## Error badges
+## 🚨 Error badges
 
 | Badge | Meaning |
 |---|---|
-| ⚠ re-auth | Token expired / not signed in (click to re-sign-in) |
-| ⚠ no access | 403 / 404 from Sheets — check sharing or API enablement |
-| ⚠ Excel format | Sheet is a `.xlsx` file uploaded to Drive. Convert to native Google Sheets first (File → Save as Google Sheets) |
-| ⚠ syntax error | Block YAML / inline call is malformed (tooltip shows the parser error) |
-| ⚠ range error | Inline syntax received a multi-cell range or invalid range for editable |
-| ⚠ fetch failed | Generic API error — hover for full message |
-| ⚠ stale Nm | Last fetch failed; showing cached value N minutes old |
-| ⚠ offline | Network is down |
+| `⚠ re-auth` | Token expired / not signed in — click to re-sign-in |
+| `⚠ no access` | 403 / 404 from Sheets — check sharing or API enablement |
+| `⚠ Excel format` | Sheet is a `.xlsx` uploaded to Drive — convert to native Google Sheets |
+| `⚠ syntax error` | Block YAML / inline call is malformed (tooltip shows the parser error) |
+| `⚠ range error` | Inline syntax got a multi-cell range, or editable got an invalid range |
+| `⚠ fetch failed` | Generic API error — hover for full message |
+| `⚠ stale Nm` | Last fetch failed; showing cached value N minutes old |
+| `⚠ offline` | Network is down |
 
-## Limitations
+## 🏗️ Architecture
 
-- Desktop only (uses Electron `safeStorage`).
+Four isolated layers:
+
+```
+┌──────────────────────────────────────────────┐
+│  Renderer   inline / block postprocessors    │
+│             editable table widget            │
+├──────────────────────────────────────────────┤
+│  Auth       OAuth (PKCE) · safeStorage       │
+│             localhost loopback callback      │
+├──────────────────────────────────────────────┤
+│  Sheets+Drive   pure HTTP (https.request)    │
+│                read · batchRead · write      │
+│                batchWrite · modifiedTime     │
+│                429 backoff                   │
+├──────────────────────────────────────────────┤
+│  Storage    LRU cache · debounced persist    │
+└──────────────────────────────────────────────┘
+```
+
+## 📋 Requirements
+
+- Obsidian **1.4+**
+- **Desktop only** (Electron `safeStorage` not available on mobile)
+- Node **18+** for build
+
+## 🚧 Limitations
+
 - `editable: true` only works with literal `range:` like `A1:B2` (not `named:` or whole sheet, not `transpose: true`).
-- No batchGet wiring yet — each inline expression is a separate API request (Phase 2).
-- `Push this block` uses `editor.setValue` which resets cursor/undo history (Phase 2: switch to `replaceRange`).
+- No batchGet wiring yet — each inline expression is a separate API request *(Phase 2)*.
+- `Push this block` uses `editor.setValue` which resets cursor/undo history *(Phase 2: replace with `replaceRange`)*.
 
-## Development
+## 🧪 Development
 
 ```bash
 npm install
 npm run dev     # esbuild watch mode
-npm test        # vitest run
+npm test        # vitest run — 59 tests across 8 files
 ```
 
-Tests cover parser / id resolver / cache / Sheets client (with `nock`) / Drive client / OAuth client (PKCE + token exchange) / TokenStore / tableFormatter. Renderer / commands / settings UI are verified manually in a real Obsidian vault.
+Tests cover: parser, id resolver, cache, Sheets client (with `nock`), Drive client, OAuth client (PKCE + token exchange), TokenStore, table formatter. Renderer / commands / settings UI are verified manually in a real Obsidian vault.
 
-## Architecture
+## 📄 License
 
-Four isolated layers:
-
-- **Auth**: `OAuthClient` (PKCE flow), `TokenStore` (`safeStorage` wrapper), `AuthService` (orchestration + localhost loopback server for the OAuth redirect).
-- **Sheets / Drive Clients**: pure HTTP wrappers using `https.request`. Read / batchRead / write / batchWrite / modifiedTime, with 429 backoff.
-- **Renderer**: `parseInlineCall` + `parseSyncBlock` + `parseWriteBlock`, `resolveSpreadsheetId`, Markdown post-processors, editable table widget.
-- **Storage**: `CacheStore` (LRU + debounced `saveData` persist).
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE) — built by [@yut0takagi](https://github.com/yut0takagi).
