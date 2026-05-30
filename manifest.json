@@ -1,0 +1,10 @@
+{
+  "id": "spread-sync",
+  "name": "Spread Sync",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Embed Google Sheets cells/ranges into Markdown with on-open sync, in-place editing, and explicit write-back.",
+  "author": "Yuto Takagi",
+  "authorUrl": "https://github.com/yut0takagi",
+  "isDesktopOnly": true
+}

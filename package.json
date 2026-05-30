@@ -1,0 +1,29 @@
+{
+  "name": "obsidian-spread-sync",
+  "version": "0.1.0",
+  "description": "Embed Google Sheets cells/ranges into Obsidian notes with on-open sync, in-place editing, and explicit write-back.",
+  "license": "MIT",
+  "author": "Yuto Takagi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yut0takagi/obsidian-spread-sync.git"
+  },
+  "homepage": "https://github.com/yut0takagi/obsidian-spread-sync#readme",
+  "bugs": "https://github.com/yut0takagi/obsidian-spread-sync/issues",
+  "keywords": ["obsidian", "obsidian-plugin", "google-sheets", "sync"],
+  "private": true,
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.20.0",
+    "nock": "^13.5.0",
+    "obsidian": "latest",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  }
+}
