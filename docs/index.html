@@ -1,168 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spread Sync — Google Sheets ↔ Obsidian</title>
-  <meta name="description" content="Embed Google Sheets cells and ranges directly into Obsidian notes. Edit them inline. Push back. PKCE OAuth, conflict-aware, batched.">
-  <meta property="og:title" content="Spread Sync — Google Sheets ↔ Obsidian">
-  <meta property="og:description" content="Embed Sheets cells/ranges in Obsidian. Edit inline. Push back. PKCE OAuth.">
+  <title>Spread Sync — Obsidian × Google Sheets</title>
+  <meta name="description" content="あなたのスプレッドシートを、Obsidianのノートの中へ。セルを埋め込み、表をその場で編集し、シートに反映する。">
+  <meta property="og:title" content="Spread Sync — Obsidian × Google Sheets">
+  <meta property="og:description" content="あなたのスプレッドシートを、Obsidianのノートの中へ。">
   <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="nav">
   <div class="container">
     <div class="brand">spread<span class="dot">·</span>sync</div>
     <ul>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#install">Install</a></li>
-      <li><a href="#setup">Setup</a></li>
-      <li><a href="#usage">Usage</a></li>
-      <li><a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">GitHub →</a></li>
+      <li><a href="#features">機能</a></li>
+      <li><a href="#install">導入</a></li>
+      <li><a href="#setup">セットアップ</a></li>
+      <li><a href="#usage">使い方</a></li>
+      <li><a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank" rel="noopener">GitHub →</a></li>
     </ul>
   </div>
 </nav>
 
+<!-- ─── HERO ─── -->
 <header class="hero">
   <div class="container">
-    <h1>Your Sheet,<br>inside your Note.</h1>
-    <p class="tag">Embed Google Sheets cells and ranges directly into Obsidian Markdown. Edit them in place. Push back. Conflict-aware writes via Drive modifiedTime. PKCE OAuth.</p>
+    <span class="eyebrow">Obsidian Plugin / 2026</span>
+    <h1>
+      あなたの<span class="em">スプレッドシート</span>を、<br>
+      Obsidian のノートの中へ。
+      <span class="small">— Spread Sync は、Markdown と Google Sheets を構文ベースでつなぐ。</span>
+    </h1>
+    <p class="lead">
+      セルを文中に埋め込む。範囲を表として表示する。表をその場で編集し、ボタン一つでシートへ反映する。
+      Drive の <code>modifiedTime</code> によるコンフリクト検出、PKCE OAuth、<code>safeStorage</code> 暗号化。
+    </p>
     <div class="cta">
-      <a class="btn btn-primary" href="#install">Get started</a>
-      <a class="btn btn-ghost" href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">View on GitHub</a>
+      <a class="btn btn-primary" href="#install">はじめる →</a>
+      <a class="btn btn-ghost" href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank" rel="noopener">GitHub を見る</a>
     </div>
-    <div class="hero-pills">
-      <span class="pill">Obsidian 1.4+</span>
-      <span class="pill">Desktop only</span>
-      <span class="pill">PKCE OAuth</span>
-      <span class="pill">MIT License</span>
-      <span class="pill">59 tests</span>
+
+    <div class="meta-row">
+      <div class="meta">Obsidian <strong>1.4+</strong></div>
+      <div class="meta">Desktop <strong>のみ</strong></div>
+      <div class="meta">License <strong>MIT</strong></div>
+      <div class="meta">Tests <strong>59 passing</strong></div>
     </div>
   </div>
 </header>
 
-<!-- ──────────────────────────────── Features ──────────────────────────────── -->
+<!-- ─── FEATURES ─── -->
 <section id="features">
   <div class="container">
-    <h2>What it does</h2>
-    <p class="lede">Read, render, edit, and push back. All inside your vault. The sheet is the source of truth — your note is the lens.</p>
+    <span class="section-num">SECTION 01 — 機能</span>
+    <h2>何ができるか</h2>
+    <p class="lede">読み取り、表示、編集、書き戻し。すべて Vault の中で完結する。シートが真実、ノートはそのレンズ。</p>
 
-    <div class="feat-grid">
+    <div class="feat-list">
       <div class="feat">
-        <div class="ico">🔢</div>
-        <h3>Inline cell read</h3>
-        <p><code>`spread_sync("id", "Sheet1", "B3")`</code> renders as the live cell value. Dataview-style hybrid.</p>
+        <span class="num">01</span>
+        <h3>インラインセル読み取り</h3>
+        <p>文中に <code>`spread_sync("id", "Sheet1", "B3")`</code> と書けば、その値が Reading View で展開される。Dataview に似た構文。</p>
       </div>
       <div class="feat">
-        <div class="ico">📋</div>
-        <h3>Range as table</h3>
-        <p>Fenced <code>```spread-sync```</code> block renders a range as a Markdown table — headers, transpose, named ranges supported.</p>
+        <span class="num">02</span>
+        <h3>範囲をテーブルで表示</h3>
+        <p>コードブロック <code>```spread-sync```</code> で範囲を Markdown テーブルとして描画。ヘッダ・転置・名前付き範囲に対応。</p>
       </div>
       <div class="feat">
-        <div class="ico">✏️</div>
-        <h3>Edit in place</h3>
-        <p>Add <code>editable: true</code> — cells become editable. Dirty cells highlight. One click pushes them all back via <code>values:batchUpdate</code>.</p>
+        <span class="num">03</span>
+        <h3>その場で編集</h3>
+        <p><code>editable: true</code> を追加すれば、セルが編集可能になる。変更したセルがハイライトされ、Push ボタンが一括反映する。</p>
       </div>
       <div class="feat">
-        <div class="ico">🛡️</div>
-        <h3>Conflict-aware</h3>
-        <p>Drive <code>modifiedTime</code> check before every push. If the sheet changed externally, you get an Overwrite / Cancel prompt.</p>
+        <span class="num">04</span>
+        <h3>明示的な書き込み</h3>
+        <p><code>```spread-write```</code> ブロックとコマンド <code>Push this block</code> で、意図した書き込みだけを安全に送信する。</p>
       </div>
       <div class="feat">
-        <div class="ico">🔐</div>
+        <span class="num">05</span>
+        <h3>コンフリクト検出</h3>
+        <p>書き込み前に Drive の <code>modifiedTime</code> を必ず確認。シートが外で変更されていた場合は上書き / キャンセルの選択を求める。</p>
+      </div>
+      <div class="feat">
+        <span class="num">06</span>
         <h3>PKCE OAuth</h3>
-        <p>Your own Google Cloud OAuth client. Refresh token encrypted via Electron <code>safeStorage</code>. Production-published consent screen avoids 7-day expiry.</p>
+        <p>ユーザーが自分の GCP プロジェクトで作った Desktop OAuth クライアントを使う。refresh token は Electron <code>safeStorage</code> で暗号化保存。</p>
       </div>
       <div class="feat">
-        <div class="ico">⚡</div>
-        <h3>Smart caching</h3>
-        <p>LRU + debounced persist. Stale-while-revalidate on file open. Manual refresh commands. Auto-disabled when editing.</p>
+        <span class="num">07</span>
+        <h3>賢いキャッシュ</h3>
+        <p>LRU + debounced persist、Stale-while-revalidate、手動 refresh コマンド。編集中は自動で再取得を停止し、編集内容を保護する。</p>
+      </div>
+      <div class="feat">
+        <span class="num">08</span>
+        <h3>堅牢なエラー処理</h3>
+        <p>429 の指数バックオフ、オフライン検知、用途別エラーバッジ（<code>no access</code> / <code>Excel format</code> / <code>re-auth</code> …）。原因が一目でわかる。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Install ──────────────────────────────── -->
+<!-- ─── INSTALL ─── -->
 <section id="install">
   <div class="container">
-    <h2>Install</h2>
-    <p class="lede">Manual install for now — Community Plugins listing is in progress.</p>
+    <span class="section-num">SECTION 02 — 導入</span>
+    <h2>インストール</h2>
+    <p class="lede">現時点では手動インストール。Community Plugins への登録は今後対応予定。</p>
 
-    <pre><code><span class="c-cmt"># clone into your vault's plugins directory</span>
+    <pre><code><span class="c-cmt"># Vault のプラグインディレクトリへ clone</span>
 cd /path/to/your/vault/.obsidian/plugins
 git clone https://github.com/yut0takagi/obsidian-spread-sync.git spread-sync
 cd spread-sync
 npm install
 npm run build</code></pre>
 
-    <p style="margin-top: 20px;">Then in Obsidian: <strong>Settings → Community plugins → enable Spread Sync</strong>.</p>
+    <p class="note-after-pre">Obsidian で <strong class="inline-strong">Settings → Community plugins → Spread Sync を有効化</strong>。</p>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Setup ──────────────────────────────── -->
+<!-- ─── SETUP ─── -->
 <section id="setup">
   <div class="container">
-    <h2>5-minute setup</h2>
-    <p class="lede">Spread Sync uses <strong>your own</strong> Google Cloud OAuth credentials. You stay in control of scopes and quota.</p>
+    <span class="section-num">SECTION 03 — セットアップ</span>
+    <h2>5 分でつなぐ</h2>
+    <p class="lede">Spread Sync はあなた自身の Google Cloud OAuth クライアントを使う。スコープと API クォータをあなたが完全に管理できる。</p>
 
     <ol class="steps">
       <li>
-        <h3>Create a Google Cloud project</h3>
-        <p>Open <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>. Pick a project or create one.</p>
+        <h3>Google Cloud プロジェクトを作成</h3>
+        <p><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> を開き、新規プロジェクト作成、または既存プロジェクトを選択。</p>
       </li>
       <li>
-        <h3>Enable the APIs</h3>
-        <p>APIs &amp; Services → Library → enable <strong>Google Sheets API</strong> and <strong>Google Drive API</strong>.</p>
+        <h3>API を有効化</h3>
+        <p>APIs &amp; Services → Library で以下を有効化：<strong class="inline-strong">Google Sheets API</strong> ／ <strong class="inline-strong">Google Drive API</strong>。</p>
       </li>
       <li>
-        <h3>Configure OAuth consent screen</h3>
-        <p>User type: <strong>External</strong>. Add scopes <code>.../auth/spreadsheets</code> and <code>.../auth/drive.metadata.readonly</code>. Publishing status: <strong>In production</strong> (avoids the 7-day refresh-token expiry).</p>
+        <h3>OAuth consent screen を設定</h3>
+        <p>User type は <strong>External</strong>。スコープに <code>.../auth/spreadsheets</code> と <code>.../auth/drive.metadata.readonly</code> を追加。Publishing status は <strong>In production</strong> にしておく（"Testing" のままだと refresh token が 7日 で失効する）。</p>
       </li>
       <li>
-        <h3>Create OAuth client</h3>
-        <p>Credentials → Create credentials → OAuth client ID → Application type: <strong>Desktop app</strong>. Copy both the Client ID and Client secret.</p>
+        <h3>OAuth クライアントを作成</h3>
+        <p>Credentials → Create credentials → OAuth client ID → Application type は <strong>Desktop app</strong>。Client ID と Client secret の両方をコピー。</p>
       </li>
       <li>
-        <h3>Enter in Obsidian</h3>
-        <p>Settings → Spread Sync → <strong>OAuth credentials</strong> section → paste both values. Click <strong>Sign in with Google</strong>. Done.</p>
+        <h3>Obsidian に入力</h3>
+        <p>Settings → Spread Sync → <strong>OAuth credentials</strong> セクションへペースト。<strong>Sign in with Google</strong> ボタンを押下。ブラウザで認可 → 完了。</p>
       </li>
     </ol>
 
-    <p style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; color: var(--text-dim); font-size: 14px; margin-top: 32px;">
-      💡 <strong>About the &ldquo;client secret&rdquo;:</strong> Google's docs explicitly say Desktop OAuth client secrets are <em>not actually confidential</em> — they ship in the binary of every desktop app. Storing it in your local Obsidian settings is consistent with how the official Google libraries handle it.
-    </p>
+    <div class="callout">
+      <strong>クライアントシークレットについて。</strong> Google の公式ドキュメントは、Desktop OAuth の client_secret は <em>機密保持できない</em> と明言している（あらゆるデスクトップアプリのバイナリ内に同梱されているため）。ローカルの Obsidian 設定に保存することは、公式ライブラリの扱いと完全に一致する。
+    </div>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Usage ──────────────────────────────── -->
+<!-- ─── USAGE ─── -->
 <section id="usage">
   <div class="container">
-    <h2>Usage</h2>
-    <p class="lede">Inline for single values, fenced blocks for ranges. Both work in Reading view. Editing requires the <code>editable: true</code> opt-in.</p>
+    <span class="section-num">SECTION 04 — 使い方</span>
+    <h2>構文と例</h2>
+    <p class="lede">単一値はインライン記法で、範囲はコードブロックで。編集はオプトイン（<code>editable: true</code>）。書き込みは明示ブロックでのみ。</p>
 
-    <div class="usage-card">
-      <h3>Inline cell</h3>
-      <p class="desc">Single value, dropped mid-sentence.</p>
-      <pre><code>The current store count is <span class="c-fn">`spread_sync</span>(<span class="c-str">"&lt;spreadsheet-id&gt;"</span>, <span class="c-str">"Sheet1"</span>, <span class="c-str">"B3"</span>)`.</code></pre>
+    <div class="use">
+      <div class="head"><h3>インラインセル</h3><span class="tag">single cell</span></div>
+      <p class="desc">文中に値を一つ埋め込む。</p>
+      <pre><code>今月の店舗数は <span class="c-fn">`spread_sync</span>(<span class="c-str">"&lt;spreadsheet-id&gt;"</span>, <span class="c-str">"Sheet1"</span>, <span class="c-str">"B3"</span>)`<span class="c-str"> </span>店です。</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>Range as a table</h3>
-      <p class="desc">Renders as a Markdown table.</p>
+    <div class="use">
+      <div class="head"><h3>範囲をテーブルに</h3><span class="tag">range</span></div>
+      <p class="desc">Markdown テーブルとしてレンダリング。ヘッダ・転置のオプションあり。</p>
       <pre><code>```spread-sync
 <span class="c-key">id</span>: &lt;spreadsheet-id&gt;
 <span class="c-key">sheet</span>: Sheet1
 <span class="c-key">range</span>: A1:D10
-<span class="c-key">header</span>: true        <span class="c-cmt"># optional, default true</span>
-<span class="c-key">transpose</span>: false    <span class="c-cmt"># optional, default false</span>
+<span class="c-key">header</span>: true        <span class="c-cmt"># 既定 true</span>
+<span class="c-key">transpose</span>: false    <span class="c-cmt"># 既定 false</span>
 ```</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>✨ Editable table</h3>
-      <p class="desc">Add <code>editable: true</code>. Click cells to edit. Push button below the table batches all dirty cells.</p>
+    <div class="use">
+      <div class="head"><h3>編集可能なテーブル</h3><span class="tag">editable ✦</span></div>
+      <p class="desc"><code>editable: true</code> を追加するとセルをクリックして編集可能。変更したセルが黄色くハイライトされ、テーブル直下の Push ボタンが <code>values:batchUpdate</code> で全変更を一度に反映する。</p>
       <pre><code>```spread-sync
 <span class="c-key">id</span>: &lt;spreadsheet-id&gt;
 <span class="c-key">sheet</span>: Sheet1
@@ -171,17 +197,18 @@ npm run build</code></pre>
 ```</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>Whole sheet</h3>
-      <p class="desc">Omit <code>range</code> and <code>named</code>.</p>
+    <div class="use">
+      <div class="head"><h3>シート全体</h3><span class="tag">whole sheet</span></div>
+      <p class="desc"><code>range</code> も <code>named</code> も省略するとシート全体を取得。</p>
       <pre><code>```spread-sync
 <span class="c-key">id</span>: &lt;spreadsheet-id&gt;
 <span class="c-key">sheet</span>: Sheet1
 ```</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>Named range</h3>
+    <div class="use">
+      <div class="head"><h3>名前付き範囲</h3><span class="tag">named range</span></div>
+      <p class="desc">スプレッドシート側で定義した名前付き範囲を参照。シートで範囲を広げても MD は触らなくてよい。</p>
       <pre><code>```spread-sync
 <span class="c-key">id</span>: &lt;spreadsheet-id&gt;
 <span class="c-key">sheet</span>: Sheet1
@@ -189,9 +216,9 @@ npm run build</code></pre>
 ```</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>Alias</h3>
-      <p class="desc">Define <code>kpi → &lt;long-spreadsheet-id&gt;</code> in settings.</p>
+    <div class="use">
+      <div class="head"><h3>エイリアス</h3><span class="tag">alias</span></div>
+      <p class="desc">設定で <code>kpi → &lt;long-spreadsheet-id&gt;</code> と定義しておくと、ノートからは <code>"@kpi"</code> で参照できる。シートを移動しても grep 置換不要。</p>
       <pre><code>```spread-sync
 <span class="c-key">id</span>: <span class="c-str">"@kpi"</span>
 <span class="c-key">sheet</span>: Sheet1
@@ -199,84 +226,99 @@ npm run build</code></pre>
 ```</code></pre>
     </div>
 
-    <div class="usage-card">
-      <h3>Explicit write block</h3>
-      <p class="desc">One-shot push. Place cursor inside the block → Command Palette → <strong>Spread Sync: Push this block</strong>.</p>
+    <div class="use">
+      <div class="head"><h3>書き込みブロック</h3><span class="tag">write</span></div>
+      <p class="desc">明示的なワンショット書き込み。ブロック内にカーソルを置き、Command Palette から <code>Spread Sync: Push this block</code>。</p>
       <pre><code>```spread-write
 <span class="c-key">id</span>: &lt;spreadsheet-id&gt;
 <span class="c-key">sheet</span>: Sheet1
 <span class="c-key">target</span>: B3
-<span class="c-key">value</span>: 42
-<span class="c-key">mode</span>: replace      <span class="c-cmt"># or "append"</span>
+<span class="c-key">value</span>: <span class="c-num">42</span>
+<span class="c-key">mode</span>: replace        <span class="c-cmt"># または "append"</span>
 ```</code></pre>
+      <p class="desc desc-tight">範囲書き込みは <code>value</code> を YAML 配列で：</p>
+      <pre><code><span class="c-key">target</span>: A1:B2
+<span class="c-key">value</span>:
+  - [<span class="c-num">1</span>, <span class="c-num">2</span>]
+  - [<span class="c-num">3</span>, <span class="c-num">4</span>]</code></pre>
     </div>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Commands ──────────────────────────────── -->
+<!-- ─── COMMANDS ─── -->
 <section id="commands">
   <div class="container">
-    <h2>Commands</h2>
-    <p class="lede">All available from the command palette (Cmd/Ctrl + P).</p>
+    <span class="section-num">SECTION 05 — コマンド</span>
+    <h2>コマンド一覧</h2>
+    <p class="lede">すべて Command Palette（Cmd / Ctrl + P）から呼び出せる。</p>
     <table>
       <thead>
-        <tr><th>Command</th><th>What it does</th></tr>
+        <tr><th>コマンド</th><th>動作</th></tr>
       </thead>
       <tbody>
-        <tr><td><code>Refresh current file</code></td><td>Invalidate cache for the active file, force re-fetch</td></tr>
-        <tr><td><code>Refresh all open files</code></td><td>Same, for every open markdown leaf</td></tr>
-        <tr><td><code>Refresh by spreadsheet</code></td><td>Prompt for id/URL/@alias, invalidate all its cache entries</td></tr>
-        <tr><td><code>Push this block</code></td><td>Send the current <code>spread-write</code> block to Sheets</td></tr>
+        <tr><td><code>Refresh current file</code></td><td>開いているファイルのキャッシュを無効化し、強制的に再取得する</td></tr>
+        <tr><td><code>Refresh all open files</code></td><td>すべての開いている Markdown ファイルに対して同じことを行う</td></tr>
+        <tr><td><code>Refresh by spreadsheet</code></td><td>id / URL / <code>@alias</code> を入力し、そのスプレッドシート配下のキャッシュをまとめて無効化する</td></tr>
+        <tr><td><code>Push this block</code></td><td>カーソル位置の <code>spread-write</code> ブロックをシートへ送信する</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Badges ──────────────────────────────── -->
+<!-- ─── BADGES ─── -->
 <section id="badges">
   <div class="container">
-    <h2>Error badges</h2>
-    <p class="lede">When something goes wrong, you see a badge with a tooltip that explains exactly what.</p>
+    <span class="section-num">SECTION 06 — バッジ</span>
+    <h2>エラーバッジ</h2>
+    <p class="lede">何かが失敗したとき、原因を一目で示すバッジとツールチップを表示する。</p>
     <table>
       <thead>
-        <tr><th>Badge</th><th>Meaning</th></tr>
+        <tr><th>バッジ</th><th>意味と対処</th></tr>
       </thead>
       <tbody>
-        <tr><td><span class="demo-badge demo-badge--auth">⚠ re-auth</span></td><td>Token expired / not signed in — click to re-sign-in</td></tr>
-        <tr><td><span class="demo-badge demo-badge--access">⚠ no access</span></td><td>403 / 404 — check sharing or API enablement</td></tr>
-        <tr><td><span class="demo-badge demo-badge--access">⚠ Excel format</span></td><td>Sheet is <code>.xlsx</code>; convert to native Google Sheets first</td></tr>
-        <tr><td><span class="demo-badge demo-badge--stale">⚠ stale 12m</span></td><td>Last fetch failed; showing cached value</td></tr>
-        <tr><td><span class="demo-badge demo-badge--offline">⚠ offline</span></td><td>Network is down</td></tr>
+        <tr><td><span class="demo-badge demo-badge--auth">⚠ re-auth</span></td><td>トークン期限切れ／未サインイン。クリックで再認証フローへ。</td></tr>
+        <tr><td><span class="demo-badge demo-badge--access">⚠ no access</span></td><td>403 / 404。シートの共有設定または API の有効化を確認。</td></tr>
+        <tr><td><span class="demo-badge demo-badge--access">⚠ Excel format</span></td><td>対象が <code>.xlsx</code> として Drive に保存されている。「ファイル → Google スプレッドシートとして保存」で変換する。</td></tr>
+        <tr><td><span class="demo-badge demo-badge--stale">⚠ stale 12m</span></td><td>直近の取得に失敗、12 分前のキャッシュを表示中。</td></tr>
+        <tr><td><span class="demo-badge demo-badge--offline">⚠ offline</span></td><td>ネットワーク未接続。</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
-<!-- ──────────────────────────────── Architecture ──────────────────────────────── -->
+<!-- ─── ARCH ─── -->
 <section id="arch">
   <div class="container">
-    <h2>Architecture</h2>
-    <p class="lede">Four isolated layers. Each one is small, testable, and replaceable.</p>
-    <pre><code>┌──────────────────────────────────────────────┐
-│  <span class="c-fn">Renderer</span>   inline / block postprocessors    │
-│              editable table widget           │
-├──────────────────────────────────────────────┤
-│  <span class="c-fn">Auth</span>       OAuth (PKCE) · safeStorage       │
-│              localhost loopback callback     │
-├──────────────────────────────────────────────┤
-│  <span class="c-fn">Sheets+Drive</span>   pure HTTP (https.request)    │
-│                 read · batchRead · write     │
-│                 batchWrite · modifiedTime    │
-│                 429 backoff                  │
-├──────────────────────────────────────────────┤
-│  <span class="c-fn">Storage</span>    LRU cache · debounced persist    │
-└──────────────────────────────────────────────┘</code></pre>
+    <span class="section-num">SECTION 07 — アーキテクチャ</span>
+    <h2>4 つの層</h2>
+    <p class="lede">それぞれ独立してテスト可能、責務が明確に分離されている。</p>
+
+    <div class="arch">
+<span class="sep">┌──────────────────────────────────────────────────┐</span>
+<span class="sep">│</span>  <span class="layer">Renderer</span>     インライン／ブロック postprocessor    <span class="sep">│</span>
+<span class="sep">│</span>                編集可能テーブル ウィジェット           <span class="sep">│</span>
+<span class="sep">├──────────────────────────────────────────────────┤</span>
+<span class="sep">│</span>  <span class="layer">Auth</span>         OAuth (PKCE) · safeStorage           <span class="sep">│</span>
+<span class="sep">│</span>                localhost loopback callback          <span class="sep">│</span>
+<span class="sep">├──────────────────────────────────────────────────┤</span>
+<span class="sep">│</span>  <span class="layer">Sheets+Drive</span> 純粋な HTTP (https.request)          <span class="sep">│</span>
+<span class="sep">│</span>                read · batchRead · write · batchWrite <span class="sep">│</span>
+<span class="sep">│</span>                modifiedTime · 429 backoff            <span class="sep">│</span>
+<span class="sep">├──────────────────────────────────────────────────┤</span>
+<span class="sep">│</span>  <span class="layer">Storage</span>      LRU cache · debounced persist        <span class="sep">│</span>
+<span class="sep">└──────────────────────────────────────────────────┘</span></div>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <p>MIT &middot; <a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank">GitHub</a> &middot; <a href="https://github.com/yut0takagi/obsidian-spread-sync/issues" target="_blank">Issues</a> &middot; built by <a href="https://github.com/yut0takagi" target="_blank">@yut0takagi</a></p>
+    <div class="ja">本ソフトウェアは「現状有姿」で提供されます。</div>
+    <p>
+      MIT License &nbsp;·&nbsp;
+      <a href="https://github.com/yut0takagi/obsidian-spread-sync" target="_blank" rel="noopener">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://github.com/yut0takagi/obsidian-spread-sync/issues" target="_blank" rel="noopener">Issues</a> &nbsp;·&nbsp;
+      built by <a href="https://github.com/yut0takagi" target="_blank" rel="noopener">@yut0takagi</a>
+    </p>
   </div>
 </footer>
 
